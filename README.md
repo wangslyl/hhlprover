@@ -11,10 +11,15 @@ Corresponding e-mail: wangsl@ios.ac.cn
 1. Extract the file, which should create the structure
 
    /HHLProver_SD
+   
    /HHLProver_SD/CaseStudies/HCS
+   
    /HHLProver_SD/HHLProver
+   
    /HHLProver_SD/QEInvGenerator
+   
    /HHLProver_SD/SOSInvGenerator
+   
    /HHLProver_SD/README.md
 
 2. Install the required tools and libraries
