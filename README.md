@@ -37,7 +37,9 @@ e. SDPT3
 3. Set environment variables
 
    $ export HHLProverSDHOME=".../HHLProver_SD"
+   
    $ export MATLABHOME=".../Matlab_R2014a/bin"
+   
    $ export MATHEMATICAHOME=".../Mathematica10/Executables"
 
 4. Demonstration on case study HCS
