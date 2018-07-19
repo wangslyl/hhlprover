@@ -17,6 +17,8 @@ consts Solution :: "proc \<Rightarrow> state \<Rightarrow> real => val"
 consts evalP :: "proc => now => history => event * proc * now * history"
 consts evalPP :: "procP => now => history => history   => event * procP * now  * history * history"
 
+
+(*We define the semantics in two ways: as axioms, or after this approach, by inductive definition*)
 (*In the semantics, we assume Skip as the terminal procedure.*)
 axiomatization where
  skip :  "evalP Skip now f = (Tau, Skip, now, f)"
@@ -224,13 +226,14 @@ where
 | conditionBF : "\<not>be (f(now)) ==> semB (IF be P) now f  now  f " 
 | conditionGBT : "be (f(now)) ==> semB (P) now f  now_d f_d \<Longrightarrow> semB (IFELSE be P Q) now f  now_d f_d"  
 | conditionGBF : "\<not>be (f(now)) ==> semB (Q) now f  now_d f_d \<Longrightarrow> semB (IFELSE be P Q) now f  now_d f_d" 
-| joinBL : " semB (P) now f  now_d f_d \<Longrightarrow> semB (P[[Q) now f  now_d f_d"
-| joinBR : " semB (Q) now f  now_d f_d \<Longrightarrow> semB (P[[Q) now f  now_d f_d"
-| repetition0B : "semB (P*&&Inv) now f now f" 
-| repetitionkB : "semB P now f now_d f_d \<Longrightarrow> semB (P*&&Inv) now_d f_d  now_dd f_dd ==>
-                semB (P*&&Inv) now f  now_dd f_dd" 
-| repetitionN0B : "N = (0::nat) \<Longrightarrow>  semB (P* NUM N) now f now f" 
-| repetitionNkB : "N >0 \<Longrightarrow> semB P now f now_d f_d \<Longrightarrow> semB (P* NUM (N-(1::nat))) now_d f_d  now_dd f_dd ==>
+| joinBL : " semB (P) now f  now_d f_d ⟹ semB (P[[Q) now f  now_d f_d"
+| joinBR : " semB (Q) now f  now_d f_d ⟹ semB (P[[Q) now f  now_d f_d"
+(*| repetition0B : "semB (P*&&Inv) now f now f" 
+| repetitionkB : "semB P now f now_d f_d ⟹ semB (P*&&Inv) now_d f_d  now_dd f_dd ==>
+                semB (P*&&Inv) now f  now_dd f_dd" *)
+| repetitionB : "∃ N. semB (P* NUM N) now f  now_dd f_dd ⟹ semB (P*&&Inv) now f  now_dd f_dd"
+| repetitionN0B : "N = (0::nat) ⟹  semB (P* NUM N) now f now f" 
+| repetitionNkB : "N >0 ⟹ semB P now f now_d f_d ⟹ semB (P* NUM (N-(1::nat))) now_d f_d  now_dd f_dd ==>
                 semB (P* NUM N) now f  now_dd f_dd" 
 | outputBC : "d\<ge>0 \<Longrightarrow> semB (Cm (ch!!e)) now f (now+d)  (%t. if t <= now+d & t > now then f(now) else f(t))"
 | inputBC : "d\<ge> 0 \<Longrightarrow> semB (Cm (ch??(RVar (x)))) now f (now + d)  
