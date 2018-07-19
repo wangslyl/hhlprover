@@ -298,39 +298,37 @@ apply (metis order_trans sem1)
 apply (metis le_max_iff_disj)+
 done
 
-lemma sem2 : "semB P now f now' f' \<Longrightarrow> ( \<forall> t. t< now \<or> t> now' \<longrightarrow> f t = f' t)"
+lemma sem2 : "semB P now f now' f' ⟹ ( ∀ t. t< now ∨ t> now' ⟶ f t = f' t)"
 apply (erule semB.induct)
 apply simp+
-apply (subgoal_tac "now \<le> now' \<and> now' \<le> now''")
+apply (subgoal_tac "now ≤ now' ∧ now' ≤ now''")
 apply (metis (poly_guards_query) antisym_conv3 le_less_trans less_not_sym)
 apply (rule conjI)
 apply (cut_tac P = "P" and now = now and  now'=now' and f = "f" and f' = "f'" in sem1, simp)
 apply metis
 apply (cut_tac P = "Q" and now = now' and  now'=now'' and f = "f'" and f' = "f''" in sem1, simp)
 apply metis+
-apply (subgoal_tac "now \<le> now_d \<and> now_d \<le> now_dd")
+apply (subgoal_tac "now ≤ now_d ∧ now_d ≤ now_dd")
 apply (metis (poly_guards_query) antisym_conv3 le_less_trans less_not_sym)
 apply (rule conjI)
 apply (cut_tac P = "P" and now = now and  now'=now_d and f = "f" and f' = "f_d" in sem1, simp)
 apply metis
-apply (cut_tac P = "P*&&Inv" and now = now_d and  now'=now_dd and f = "f_d" and f' = "f_dd" in sem1, simp)
+apply (cut_tac P = "P* NUM (N - 1)" and now = now_d and  now'=now_dd and f = "f_d" and f' = "f_dd" in sem1, simp)
 apply metis
-apply (metis less_not_sym not_le)
-apply (metis le_less_trans less_le_trans sem1)
-apply (metis add_less_same_cancel1 less_not_sym not_le)
-by (metis add_less_same_cancel1 less_not_sym not_le)
+   apply (metis less_not_sym not_le)
+ by auto
 
 
-lemma semB2 : "semBP (P||Q) nowp fp nowq fq nowp' fp' nowq' fq' \<Longrightarrow> 
-  ( \<forall> t. t< nowp \<or> t> nowp' \<longrightarrow> (fp t = fp' t))
-\<and>  ( \<forall> t. t< nowq \<or> t> nowq' \<longrightarrow> (fq t = fq' t))"
+lemma semB2 : "semBP (P||Q) nowp fp nowq fq nowp' fp' nowq' fq' ⟹ 
+  ( ∀ t. t< nowp ∨ t> nowp' ⟶ (fp t = fp' t))
+∧  ( ∀ t. t< nowq ∨ t> nowq' ⟶ (fq t = fq' t))"
 apply (erule semBP.induct)
 apply (metis sem2)
-apply (subgoal_tac "nowp \<le> nowp'\<and> nowq \<le> nowq'\<and> nowp'\<le> nowu'\<and> nowq'\<le> nowv'")
-apply (subgoal_tac "(\<forall>t. t < nowp' \<or> nowu' < t \<longrightarrow> fp' t = fu' t) \<and> (\<forall>t. t < nowq' \<or> nowv' < t \<longrightarrow> fq' t = fv' t)")
-apply (metis le_less_trans less_le_trans) 
-apply (metis sem2) 
-apply (metis sem1 semB1)
+apply (subgoal_tac "nowp ≤ nowp'∧ nowq ≤ nowq'∧ nowp'≤ nowu'∧ nowq'≤ nowv'")
+apply (subgoal_tac "(∀t. t < nowp' ∨ nowu' < t ⟶ fp' t = fu' t) ∧ (∀t. t < nowq' ∨ nowv' < t ⟶ fq' t = fv' t)")
+apply simp
+apply (simp add: sem2)
+apply (simp add: sem1 semB1)
 apply (rule conjI)
 apply (metis less_irrefl less_max_iff_disj max_def not_le semB1)
 apply (metis less_irrefl less_max_iff_disj max_def not_le semB1)
@@ -338,6 +336,7 @@ apply (rule conjI)
 apply (metis less_irrefl less_max_iff_disj max_def not_le semB1)
 apply (metis less_irrefl less_max_iff_disj max_def not_le semB1)
 done
+
 
 
 
