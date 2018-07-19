@@ -383,11 +383,46 @@ done
  
 (*Repetition rule*)
 
-lemma RepetitionRule: "\<forall>h n m. (H[^]H) h n m \<longrightarrow> H h n m \<Longrightarrow> \<forall> s. (p s \<longrightarrow> Inv s \<and> Inv s \<longrightarrow> q s) 
-\<Longrightarrow> {Inv} P {Inv; H}  ==>  {p} P*&&Inv {q; H} "
-apply (simp add:Valid_def) apply clarify
-sorry
+  
+lemma Repetition_aux_1: " semB (P* NUM 0) now h now' h' ⟹
+       ∀h n m. (H[^]H) h n m ⟶ H h n m ⟹
+       ∀now h now' h'. semB P now h now' h' ⟶ Inv (h now) ⟶ Inv (h' now') ∧ H h' now now' ⟹
+       Inv (h now) ⟹ Inv (h' now') ∧ (H h' now now' ∨ now' = now)"
+  apply (ind_cases "semB (P* NUM 0) now h now' h'", auto)
+  done
+    
+    
+lemma Repetition_aux_2: " (⋀now h now' h'. semB (P* NUM N) now h now' h' ⟹ Inv (h now) ⟹ Inv (h' now') ∧ (H h' now now' ∨ now' = now)) ⟹
+       semB (P* NUM Suc N) now h now' h' ⟹
+       ∀h n m. (H[^]H) h n m ⟶ H h n m ⟹
+       ∀now h now' h'. semB P now h now' h' ⟶ Inv (h now) ⟶ Inv (h' now') ∧ H h' now now' ⟹
+       Inv (h now) ⟹ Inv (h' now') ∧ (H h' now now' ∨ now' = now)"
+  apply (ind_cases "semB (P* NUM Suc N) now h now' h'")
+  apply simp
+  by (smt DC chop_def sem1 sem2)
 
+lemma Repetition_aux: "semB (P* NUM N) now h now' h' ⟹ 
+                     ∀h n m. (H[^]H) h n m ⟶ H h n m ⟹
+                     ∀now h now' h'. semB P now h now' h' ⟶ Inv (h now) ⟶ Inv (h' now') ∧ H h' now now' ⟹
+                     Inv (h now) ⟹ Inv (h' now') ∧ (H [[|]] (λh n nd. nd = n)) h' now now'"
+apply (simp add:dOr_def)
+apply (induction N arbitrary: now h now' h')
+   apply (rule Repetition_aux_1) apply simp+
+  apply (cut_tac P = P and N = N and now = now and h = h and h' = h' and Inv = Inv in Repetition_aux_2, auto)
+    done
+
+lemma RepetitionRule: "∀h n m. (H[^]H) h n m ⟶ H h n m ⟹ {Inv} P {Inv; H}  
+                      ==>  {Inv} P*&&Inv {Inv; (H [[|]] (elE 0))} "
+  apply (simp add:Valid_def) apply clarify 
+  apply (rule Repetition_aux)
+   apply simp+
+  done
+
+(*Join Rule*)
+lemma JoinRule : "{p} P {m; H} ⟹ {p} Q {q; G} ==>
+             {p} P [[ Q {m [|] q; H [[|]] G}"
+  apply (simp add:Valid_def fOr_def dOr_def, auto)
+    done
 
 
 (*Consequence rule*)
